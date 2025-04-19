@@ -10,8 +10,9 @@ EMAIL_SENDER = "shalinvachheta2016@gmail.com"
 EMAIL_PASSWORD = "zqvb oamk memj aewx"
 EMAIL_RECEIVER = "shalin2010vachheta@gmail.com"
 
-
 # === STEPSTONE SCRAPER ===
+
+
 def get_stepstone_jobs():
     headers = {"User-Agent": "Mozilla/5.0"}
     queries = ["machine+learning+intern",
@@ -169,8 +170,6 @@ def run_agent():
     send_email_with_excel(all_jobs)
 
 
-# Schedule this to run every 24 hours
+# Run once (GitHub Actions will handle daily scheduling)
 if __name__ == "__main__":
-    while True:
-        run_agent()
-        time.sleep(24 * 60 * 60)  # 24 hours
+    run_agent()
