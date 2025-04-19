@@ -20,18 +20,18 @@ def get_stepstone_jobs():
     for query in queries:
         url = f"https://www.stepstone.de/jobs/{query}.html"
 
-        # Retry logic with timeout
         for attempt in range(3):
             try:
                 response = requests.get(url, headers=headers, timeout=10)
                 if response.status_code == 200:
                     break
-            except Exception as e:
+            except requests.exceptions.RequestException as e:
                 print(f"[StepStone] Attempt {attempt+1} failed for {url}: {e}")
                 time.sleep(2)
         else:
-            print(f"[StepStone] Failed to fetch after 3 attempts: {url}")
-            continue
+            print(f"[StepStone] StepStone is not responding — skipping...")
+            return []  # <-- Don't crash, just skip
+
 
         soup = BeautifulSoup(response.content, "html.parser")
         for job_card in soup.select("article[data-at=job-item]")[:10]:
