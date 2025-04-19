@@ -12,23 +12,32 @@ EMAIL_PASSWORD = "zqvb oamk memj aewx"
 EMAIL_RECEIVER = "shalin2010vachheta@gmail.com"
 
 # === STEPSTONE SCRAPER ===
-
-
 def get_stepstone_jobs():
     headers = {"User-Agent": "Mozilla/5.0"}
-    queries = ["machine+learning+intern",
-               "data+science+werkstudent", "master+thesis+machine+learning"]
+    queries = ["machine+learning+intern", "data+science+werkstudent", "master+thesis+machine+learning"]
     jobs = []
+
     for query in queries:
         url = f"https://www.stepstone.de/jobs/{query}.html"
-        response = requests.get(url, headers=headers)
+
+        # Retry logic with timeout
+        for attempt in range(3):
+            try:
+                response = requests.get(url, headers=headers, timeout=10)
+                if response.status_code == 200:
+                    break
+            except Exception as e:
+                print(f"[StepStone] Attempt {attempt+1} failed for {url}: {e}")
+                time.sleep(2)
+        else:
+            print(f"[StepStone] Failed to fetch after 3 attempts: {url}")
+            continue
+
         soup = BeautifulSoup(response.content, "html.parser")
         for job_card in soup.select("article[data-at=job-item]")[:10]:
             title = job_card.select_one("h2").get_text(strip=True)
-            company = job_card.select_one(
-                "div[data-at=job-item-company-name]").get_text(strip=True)
-            location = job_card.select_one(
-                "div[data-at=job-item-location]").get_text(strip=True)
+            company = job_card.select_one("div[data-at=job-item-company-name]").get_text(strip=True)
+            location = job_card.select_one("div[data-at=job-item-location]").get_text(strip=True)
             link = job_card.find("a", href=True)["href"]
             full_link = f"https://www.stepstone.de{link}"
 
@@ -45,8 +54,6 @@ def get_stepstone_jobs():
     return jobs
 
 # === INDEED SCRAPER ===
-
-
 def get_indeed_jobs():
     headers = {"User-Agent": "Mozilla/5.0"}
     queries = [
@@ -61,10 +68,8 @@ def get_indeed_jobs():
         soup = BeautifulSoup(response.content, "html.parser")
         for card in soup.select("a.tapItem")[:10]:
             title = card.select_one("h2 span").get_text(strip=True)
-            company = card.select_one("span.companyName").get_text(
-                strip=True) if card.select_one("span.companyName") else "Unknown"
-            location = card.select_one("div.companyLocation").get_text(
-                strip=True) if card.select_one("div.companyLocation") else "Unknown"
+            company = card.select_one("span.companyName").get_text(strip=True) if card.select_one("span.companyName") else "Unknown"
+            location = card.select_one("div.companyLocation").get_text(strip=True) if card.select_one("div.companyLocation") else "Unknown"
             link = "https://de.indeed.com" + card["href"]
 
             jobs.append({
@@ -80,8 +85,6 @@ def get_indeed_jobs():
     return jobs
 
 # === COMPANY CAREER PAGES (STATIC LINKS) ===
-
-
 def get_company_jobs():
     now = datetime.now().strftime('%Y-%m-%d %H:%M')
     return [
@@ -138,8 +141,6 @@ def get_company_jobs():
     ]
 
 # === EMAIL SETUP ===
-
-
 def send_email_with_excel(jobs):
     df = pd.DataFrame(jobs)
     filename = f"job_listings_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
@@ -149,20 +150,16 @@ def send_email_with_excel(jobs):
     msg['Subject'] = '🤖 Latest ML/DS Job Listings'
     msg['From'] = EMAIL_SENDER
     msg['To'] = EMAIL_RECEIVER
-    msg.set_content(
-        'Attached are the most recent job listings matching your profile.')
+    msg.set_content('Attached are the most recent job listings matching your profile.')
 
     with open(filename, 'rb') as f:
-        msg.add_attachment(f.read(), maintype='application',
-                           subtype='vnd.openxmlformats-officedocument.spreadsheetml.sheet', filename=filename)
+        msg.add_attachment(f.read(), maintype='application', subtype='vnd.openxmlformats-officedocument.spreadsheetml.sheet', filename=filename)
 
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
         smtp.login(EMAIL_SENDER, EMAIL_PASSWORD)
         smtp.send_message(msg)
 
 # === MAIN WORKFLOW ===
-
-
 def run_agent():
     stepstone_jobs = get_stepstone_jobs()
     indeed_jobs = get_indeed_jobs()
@@ -170,7 +167,6 @@ def run_agent():
     all_jobs = stepstone_jobs + indeed_jobs + company_jobs
     send_email_with_excel(all_jobs)
 
-
-# Run once (GitHub Actions will handle daily scheduling)
+# Run once (GitHub Actions will handle scheduling)
 if __name__ == "__main__":
     run_agent()
