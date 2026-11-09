@@ -1,5 +1,27 @@
 # 🤖 Job Scout Agent
 
+## Project Summary
+
+### What is this project?
+This project gathers job listings and organizes them in a report.
+
+### Why is it interesting?
+Checking several job websites manually every day takes time.
+
+### How does it work?
+Scripts collect listings and format the information for review.
+
+### Real-life example
+Instead of opening many career pages every morning, you review one collected report. It does not apply for you.
+
+### What did I learn?
+I practiced collecting web information, scheduling tasks, and creating useful reports.
+
+---
+
+## Technical Documentation
+
+
 A fully automated job scouting bot that scrapes Machine Learning, Data Science, and AI opportunities across popular platforms and sends you a personalized Excel report daily — right to your inbox!
 
 ---
