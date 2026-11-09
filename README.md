@@ -2,20 +2,9 @@
 
 ## Project Summary
 
-### What is this project?
-This project gathers job listings and organizes them in a report.
+Searching different job websites every morning can take a lot of time. This project collects job openings and organizes them in one report. The challenge is gathering information from several sources and turning it into something easy to review.
 
-### Why is it interesting?
-Checking several job websites manually every day takes time.
-
-### How does it work?
-Scripts collect listings and format the information for review.
-
-### Real-life example
-Instead of opening many career pages every morning, you review one collected report. It does not apply for you.
-
-### What did I learn?
-I practiced collecting web information, scheduling tasks, and creating useful reports.
+The scripts look for listings and put useful details into a report. For example, instead of opening several company career pages, you can check one summary of opportunities. I learned how web data collection, scheduling, and simple reporting can reduce repeated work. The project does not submit applications.
 
 ---
 
